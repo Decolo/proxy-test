@@ -105,14 +105,37 @@ const parkMessage = async(ctx) => {
 }
 
 const userId = async(ctx) => {
-  const url = 'http://eip.8531.cn' + ctx.request.url
-  const requestConfig = new RequestConfig(ctx, url).headerParser().bodyParser()
+  var options = { 
+    method: 'POST',
+    url: 'http://erp.8531.cn/service/MobilePaylipServlet',
+    headers: { 
+      'cache-control': 'no-cache',
+      'Content-Type': 'application/x-www-form-urlencoded' 
+    },
+    form: { 
+      method: 'getClerkCode',
+      usercode: 'caichen',
+      visitTime: '1542091675070',
+      key: 'ab7ff2ec1065f50d16679907ffd56ae6' 
+    } 
+  }
 
   try {
-    const result = await requestPromise(requestConfig.options)
+    const result = await new Promise((resolve, reject) => {
+      request(options, function (error, response, body) {
+        if (error) {
+          reject(error)
+        } else {
+          resolve({
+            response,
+            body
+          })  
+        }
+      })
+    })
+    
     const { response, body } = result
-    const { statusCode = 404 } = response
-    ctx.response.statusCode = statusCode
+    ctx.response.statusCode = response.statusCode
     ctx.body = body
   } catch(error) {
     handleError(error)
@@ -126,6 +149,7 @@ const handleError = error => {
 }
 
 module.exports = {
+  userId,
   userInfo,
   parkMessage
 }

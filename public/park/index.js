@@ -100,8 +100,8 @@ var render = function(data, userCenter) {
   }
 }
 
-var queryUserID = function() {
-  var visitTime = new Date().getTime()
+var queryUserID = function(userName, result, userCenter) {
+  var visitTime = new Date().getTime().toString()
 
   var settings = {
     // http://erp.8531.cn/service/MobilePaylipServlet
@@ -113,17 +113,42 @@ var queryUserID = function() {
     },
     'data': {
       'method': 'getClerkCode',
-      'usercode': '',
-      'visitTime': visitTime + '',
+      'usercode': userName,
+      'visitTime': visitTime,
       'key': md5('getClerkCode_' + visitTime + '_^#Erp,.[-]')
     },
-    'success': function(data) {
+    'dataType': 'json',
+    'success': function(res) {
+      var data
+      if (typeof res === 'string') {
+        data = JSON.parse(res)
+      } else {
+        data = res
+      }
+      if (data.des !== '查询成功！') {
+        alert(查询工号失败)
+        return
+      }
       
+      var usercode = data.clerkCode
+      if (result.Rows.length) {
+        var userInfo = result.Rows[0]
+        userCenter.username = userInfo.UserName
+        userCenter.userID = usercode
+        userCenter.userLoginName = userInfo.userLoginName
+        userCenter.mobile = userInfo.Mobile
+      
+        checkPark(userCenter)
+      } else {
+        renderNoPark()
+      }
     },
     'error': function(error) {
       alert('获取工号出错')
     }
   }
+
+  $.ajax(settings)
 }
 
 var queryUserInfo = function(userName, userCenter) {
@@ -147,19 +172,7 @@ var queryUserInfo = function(userName, userCenter) {
         result = JSON.parse(data.children[0].innerHTML)
       }
 
-      queryUserID
-      
-      if (result.Rows.length) {
-        var userInfo = result.Rows[0]
-        userCenter.username = userInfo.UserName
-        userCenter.userID = userInfo.UserID
-        userCenter.userLoginName = userInfo.userLoginName
-        userCenter.mobile = userInfo.Mobile
-      
-        checkPark(userCenter)
-      } else {
-        renderNoPark()
-      }
+      queryUserID(userName, result, userCenter)
     },
     'error': function() {
       alert('获取用户信息出错')
@@ -173,4 +186,5 @@ $(document).ready(function() {
   var userCenter = {}
 
   queryUserInfo(userName, userCenter)
+  console.log(md5('getClerkCode_' + '1542091675070' + '_^#Erp,.[-]'))
 })
