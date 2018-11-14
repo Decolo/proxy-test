@@ -1,65 +1,4 @@
-const qs = require('querystring')
-const request = require('request')
-
-class RequestConfig {
-  constructor(ctx, url) {
-    this.ctx = ctx
-    this.options = {
-      url,
-      method: typeof ctx.request.method === 'string' ?
-       ctx.request.method.toUpperCase()
-       : 'GET'
-    }
-  }
-  headerParser() {
-    const headers = this.ctx.request.header
-    delete headers.host
-    delete headers.origin
-    delete headers.referer
-    const contentType = this.ctx.request.header['content-type'] || 'application/x-www-form-urlencoded'  
-    delete headers['content-type']
-    headers['Content-Type'] = contentType
-    this.options = {
-      ...this.options,  
-      headers
-    }
-    return this
-  }
-  bodyParser() {
-    const contentType = this.ctx.request.header['Content-Type'] || 'application/x-www-form-urlencoded'
-    switch (contentType) {
-      case 'application/json': 
-        this.options = {
-          ...this.options,
-          body: this.ctx.request.body,
-          json: true
-        }   
-        break
-      default:
-        this.options = {
-          ...this.options,
-          form: this.ctx.request.body   
-        }
-    }
-
-    return this
-  }
-}
-
-const requestPromise = options => {
-  return new Promise((resolve, reject) => {
-    request(options, (error, response, body) => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve({
-          response,
-          body
-        })
-      }
-    })
-  })
-}
+const { RequestConfig, requestPromise, request, handleError } = require('./utils')
 
 const userInfo = async(ctx) => {
   const url = 'http://eip.8531.cn' + ctx.request.url
@@ -112,14 +51,9 @@ const userId = async(ctx) => {
       'cache-control': 'no-cache',
       'Content-Type': 'application/x-www-form-urlencoded' 
     },
-    form: { 
-      method: 'getClerkCode',
-      usercode: 'caichen',
-      visitTime: '1542091675070',
-      key: 'ab7ff2ec1065f50d16679907ffd56ae6' 
-    } 
+    form: ctx.request.body 
   }
-
+  
   try {
     const result = await new Promise((resolve, reject) => {
       request(options, function (error, response, body) {
@@ -142,14 +76,9 @@ const userId = async(ctx) => {
   }
 }
 
-const handleError = error => {
-  console.log('error:' + String(error))
-  ctx.response.status = 500
-  ctx.response.body = 'Server Error'
-}
-
 module.exports = {
   userId,
   userInfo,
-  parkMessage
+  parkMessage,
+  handleError
 }

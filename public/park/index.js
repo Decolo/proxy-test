@@ -8,7 +8,7 @@ var QueryPark = (function() {
     this.usercode = this.getUserCode()
     this.$infoContainer = $('.info-container')
     this.$noParkContainer =$('.no-park-container')
-    return
+    return this
   }
 
   _QueryPark.prototype.getUserCode = function() {
@@ -23,6 +23,7 @@ var QueryPark = (function() {
   }
 
   _QueryPark.prototype.fetchUserInfo = function() {
+    var self = this
     var settings = {
       // 'url': 'http://eip.8531.cn/8531ClientService/InfoWebService/EIPWebService.asmx/GetUserInfoByUserID',
       'url': '/8531ClientService/InfoWebService/EIPWebService.asmx/GetUserInfoByUserID',
@@ -43,7 +44,7 @@ var QueryPark = (function() {
           result = JSON.parse(data.children[0].innerHTML)
         }
   
-        this.fetchUserID(result)
+        self.fetchUserID(result)
       },
       'error': function() {
         alert('获取用户信息出错')
@@ -62,7 +63,9 @@ var QueryPark = (function() {
     requestTimeString += date.getSeconds()
     return requestTimeString
   }
+
   _QueryPark.prototype.fetchUserID = function(userInfos) {
+    var self = this
     var visitTime = new Date().getTime().toString()
   
     var settings = {
@@ -94,15 +97,15 @@ var QueryPark = (function() {
         
         var userID = data.clerkCode
         if (userInfos.Rows.length) {
-          var userInfo = result.Rows[0]
-          this.userCenter.username = userInfo.UserName
-          this.userCenter.userID = userID
-          this.userCenter.userLoginName = userInfo.userLoginName
-          this.userCenter.mobile = userInfo.Mobile
+          var userInfo = userInfos.Rows[0]
+          self.userCenter.username = userInfo.UserName
+          self.userCenter.userID = userID
+          self.userCenter.userLoginName = userInfo.userLoginName
+          self.userCenter.mobile = userInfo.Mobile
         
-          this.checkPark()
+          self.checkPark()
         } else {
-          this.renderNoPark()
+          self.renderNoPark()
         }
       },
       'error': function(error) {
@@ -114,6 +117,7 @@ var QueryPark = (function() {
   }
   
   _QueryPark.prototype.checkPark = function() {
+    var self = this
     var date = new Date()
     var transactionID = date.getTime().toString()
     
@@ -151,7 +155,7 @@ var QueryPark = (function() {
       },
       'data': JSON.stringify(params),
       'success': function(result) {
-        this.render(result)
+        self.render(result)
       },
       'error': function(xhr, type) {
         alert('请求停车信息出错')
@@ -165,9 +169,9 @@ var QueryPark = (function() {
     var busiInfo = data.busiInfo
   
     if (busiInfo.customerInfo) {
-      renderInfo(busiInfo)
+      this.renderInfo(busiInfo)
     } else {
-      renderNoPark()  
+      this.renderNoPark()  
     }
   }
 
@@ -181,7 +185,7 @@ var QueryPark = (function() {
     $('.name').text(this.userCenter.username)
     $('.data.worker-id').text(this.userCenter.userID)
     $('.data.car-id').text(busiInfo.customerInfo.licensePlate)
-    $('.data.time-left').text(busiInfo.customerInfo.balanceInfos[0].accountBalance)
+    $('.data.time-left').text(busiInfo.customerInfo.balanceInfos[0].balanceUnit + '小时')
   }
 
   _QueryPark.prototype.renderNoPark = function() {
@@ -195,7 +199,7 @@ var QueryPark = (function() {
 
   return {
     init: function() {
-      new QueryPark()
+      new _QueryPark()
     }
   }
 })()

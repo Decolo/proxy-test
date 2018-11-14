@@ -58,7 +58,7 @@ var QuerySalary = (function() {
     var settings = {
       // http://10.100.60.70:87/uapws/service/IMobilePaylipService?wsdl
       // http://61.164.45.179:1099/service/IMobilePaylipService?wsdl
-      'url': '/uapws/service/IMobilePaylipService?wsdl',
+      'url': '/service/MobilePaylipServlet',
       'type': 'POST',
       'headers': {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -71,6 +71,7 @@ var QuerySalary = (function() {
         'visitTime': visitTime,
         'key': key
       },
+      'dataType': 'json',
       'success': function(res) {
         console.log(res)
       },
