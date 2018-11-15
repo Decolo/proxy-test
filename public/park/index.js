@@ -29,6 +29,7 @@ var QueryPark = (function() {
       'url': '/8531ClientService/InfoWebService/EIPWebService.asmx/GetUserInfoByUserID',
       'type': 'POST',
       'headers': {
+        // default: application/x-www-form-urlencoded
         'Content-Type': 'application/x-www-form-urlencoded',
         'cache-control': 'no-cache',
       },
@@ -76,13 +77,13 @@ var QueryPark = (function() {
         'Content-Type': 'application/x-www-form-urlencoded',
         'cache-control': 'no-cache',
       },
+      'dataType': 'json',
       'data': {
         'method': 'getClerkCode',
         'usercode': this.usercode,
         'visitTime': visitTime,
         'key': md5('getClerkCode_' + visitTime + '_^#Erp,.[-]')
       },
-      'dataType': 'json',
       'success': function(res) {
         var data
         if (typeof res === 'string') {

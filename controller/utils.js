@@ -26,17 +26,18 @@ class RequestConfig {
     }
   }
   headerParser() {
-    const headers = this.ctx.request.header
-    delete headers.host
-    delete headers.origin
-    delete headers.referer
-    const contentType = this.ctx.request.header['content-type'] || 'application/x-www-form-urlencoded'  
-    delete headers['content-type']
-    headers['Content-Type'] = contentType
+    delete this.ctx.request.header.host
+    delete this.ctx.request.header.origin
+    delete this.ctx.request.header.referer
     this.options = {
-      ...this.options,  
-      headers
+      ...this.options,
+      headers: this.ctx.request.header
+      // headers: {
+      //   'cache-control': 'no-cache',
+      //   'content-type': 'application/x-www-form-urlencoded'
+      // }
     }
+  
     return this
   }
   bodyParser() {
@@ -55,7 +56,6 @@ class RequestConfig {
           form: this.ctx.request.body   
         }
     }
-
     return this
   }
 }

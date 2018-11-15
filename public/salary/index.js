@@ -15,6 +15,7 @@ var QuerySalary = (function() {
     this.$submitBtn = $('.submit')
     this.$salaryInfo = $('.salary-info')
     this.$inputPwd = $('.input-pwd')
+    this.$salaryList = $('.salary-list')
     this.$login.css({
       display: 'block'
     })
@@ -51,9 +52,10 @@ var QuerySalary = (function() {
   }
 
   _QuerySalary.prototype.fetchSalaryInfo = function() {
+    var self = this
     var visitTime = new Date().getTime().toString()
     var key = md5('getSalary_' + visitTime + '_^#Erp,.[-]')
-    var salarypswd = md5(this.password + '_^#Erp,.[-]')
+    var salarypswd = md5(this.password + '_^#Erp,.[-]').toUpperCase()
 
     var settings = {
       // http://10.100.60.70:87/uapws/service/IMobilePaylipService?wsdl
@@ -61,7 +63,7 @@ var QuerySalary = (function() {
       'url': '/service/MobilePaylipServlet',
       'type': 'POST',
       'headers': {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'content-type': 'application/x-www-form-urlencoded',
         'cache-control': 'no-cache',
       },
       'data': {
@@ -73,7 +75,17 @@ var QuerySalary = (function() {
       },
       'dataType': 'json',
       'success': function(res) {
-        console.log(res)
+        if (Number(res.flag)) {
+          alert(res.des)
+        } else {
+          self.$login.css({
+            display: 'none'
+          })
+          self.$salaryInfo.css({
+            display: 'block'
+          })
+          self.render(res)
+        }
       },
       'error': function(xhr, type) {
         alert('请求薪资出错')
@@ -81,6 +93,28 @@ var QuerySalary = (function() {
       }
     }
     $.ajax(settings)
+  }
+
+  _QuerySalary.prototype.render = function(data) {
+    var salarystructlist = data.salarystructlist
+    var salarydetaillist, clerkInfo
+    var listTemplate = ''
+    if (salarystructlist.length) {
+      salarydetaillist = salarystructlist[0].salarydetaillist
+      clerkInfo = {
+        clerkCode: data.clerkCode,
+        clerkName: salarydetaillist.shift().showcontent
+      }
+      $('.username').text(clerkInfo.clerkName)
+      $('.work-id').text(clerkInfo.clerkCode)
+
+      salarydetaillist.forEach(function(item) {
+        listTemplate += '<li class="row"><div class="column item-name">' +
+          item.showtitle + '</div><div class="data"></div>' +
+          item.showcontent + '</div></li>'
+      })
+      this.$salaryList.html(listTemplate)
+    } 
   }
 
   return ({
