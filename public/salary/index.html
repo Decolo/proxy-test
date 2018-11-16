@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>薪资查询</title>
-  <link href="./style.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" type="text/css" href="css/mobileSelect.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css"/>
   <script>
     (function (doc, win){
       var docEle = doc.documentElement
@@ -53,14 +54,17 @@
         <div class="username">子小飞</div>
         <div class="worker-id-container">工号<span class="worker-id">10123</span></div>
       </div>
-      <div class="date-picker"></div>
+      <div class="date-picker">
+        <div id="mobileSelect-date">选择日期</div>
+      </div>
     </div>
     <ul class="salary-list">
     </ul>
   </div>
-  <script type="application/javascript" src="md5.min.js"></script>
-  <script type="application/javascript" src="zepto.min.js"></script>
-  <script type="application/javascript" src="fastclick.js"></script>
-  <script type="application/javascript" src="index.js"></script>
+  <script type="text/javascript" src="lib/md5.min.js"></script>
+  <script type="text/javascript" src="lib/zepto.min.js"></script>
+  <script type="text/javascript" src="lib/fastclick.js"></script>
+  <script type="text/javascript" src="module/mobileSelect.js"></script>
+  <script type="text/javascript" src="index.js"></script>
 </body>
 </html>

@@ -36,7 +36,7 @@ ul, li {
   top: 50%;
   left: 7.4rem;
   margin-top: -3.6rem;
-  background-image: url('./image/pwd@3x.png');
+  background-image: url('../img/pwd@3x.png');
   background-size: cover;
   background-position: 0 0;
 }
@@ -85,7 +85,7 @@ ul, li {
 .avatar {
   width: 10rem;
   height: 10rem;
-  background-image: url('./image/avatar@3x.png');
+  background-image: url('../img/avatar@3x.png');
   background-size: cover;
   background-position: 0 0;
 }

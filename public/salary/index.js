@@ -6,7 +6,7 @@ if ('addEventListener' in document) {
 
 var QuerySalary = (function() {
   function _QuerySalary() {
-    this.init().bindEvent()
+    this.init().bindEvent().initMobileSelect()
   }
 
   _QuerySalary.prototype.init = function() {
@@ -40,6 +40,38 @@ var QuerySalary = (function() {
     return this
   }
 
+  _QuerySalary.prototype.initMobileSelect = function() {
+    var self = this
+    var monthes = [], years = []
+    var dateNow = new Date()
+    var yearNow = dateNow.getFullYear()
+    var monthNow = dateNow.getMonth() + 1
+    var monthNowIndex
+    for (var i = 1; i <= 12; i++) {
+      if (monthNow === i) {
+        monthNowIndex = i - 1
+      }
+      monthes.push(i)
+    }
+    for (var j = 1949; j <= yearNow; j++) {
+      years.push(j)
+    }
+  
+    new MobileSelect({
+      trigger: '#mobileSelect-date',
+      title: '请选择',
+      wheels: [
+        {data: years},
+        {data: monthes}
+      ],
+      position:[years.length - 1, monthNowIndex],
+      callback: function(indexArr, data) {
+        self.fetchSalaryInfo(data)
+      },
+      ensureBtnColor: 'red',
+    })
+  }
+
   _QuerySalary.prototype.getUserCode = function() {
     var matchUserCodes = location.href.match('UserId=\\w*', 'gi')
 
@@ -51,12 +83,23 @@ var QuerySalary = (function() {
     }
   }
 
-  _QuerySalary.prototype.fetchSalaryInfo = function() {
+  _QuerySalary.prototype.fetchSalaryInfo = function(dates) {
     var self = this
     var visitTime = new Date().getTime().toString()
     var key = md5('getSalary_' + visitTime + '_^#Erp,.[-]')
     var salarypswd = md5(this.password + '_^#Erp,.[-]').toUpperCase()
 
+    var data = {
+      'method': 'getSalary',
+      'usercode': this.usercode,
+      'salarypswd': salarypswd,
+      'visitTime': visitTime,
+      'key': key
+    }
+    if (dates && dates.length) {
+      data.year = dates[0]
+      data.period = dates[1]
+    }
     var settings = {
       // http://10.100.60.70:87/uapws/service/IMobilePaylipService?wsdl
       // http://61.164.45.179:1099/service/IMobilePaylipService?wsdl
@@ -66,13 +109,7 @@ var QuerySalary = (function() {
         'content-type': 'application/x-www-form-urlencoded',
         'cache-control': 'no-cache',
       },
-      'data': {
-        'method': 'getSalary',
-        'usercode': this.usercode,
-        'salarypswd': salarypswd,
-        'visitTime': visitTime,
-        'key': key
-      },
+      'data': data,
       'dataType': 'json',
       'success': function(res) {
         if (Number(res.flag)) {
@@ -124,4 +161,6 @@ var QuerySalary = (function() {
   })
 })()
 
-QuerySalary.init()
+$(document).ready(function() {
+  QuerySalary.init()
+})
