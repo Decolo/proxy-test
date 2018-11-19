@@ -53,7 +53,7 @@ var QuerySalary = (function() {
       }
       monthes.push(i)
     }
-    for (var j = 1949; j <= yearNow; j++) {
+    for (var j = 1987; j <= yearNow; j++) {
       years.push(j)
     }
   
@@ -64,11 +64,12 @@ var QuerySalary = (function() {
         {data: years},
         {data: monthes}
       ],
-      position:[years.length - 1, monthNowIndex],
+      positions: [0, 0],
+      // position:[years.length - 1, monthNowIndex],
       callback: function(indexArr, data) {
         self.fetchSalaryInfo(data)
       },
-      ensureBtnColor: 'red',
+      ensureBtnColor: '#b83e3d',
     })
   }
 
