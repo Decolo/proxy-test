@@ -6,6 +6,7 @@ const app = new Koa()
 const router = require('./router')
 
 app.use(bodyParser())
+
 app.use(staticParser(path.resolve(__dirname, './public')))
 app.use(router.routes())
 

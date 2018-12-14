@@ -25,35 +25,26 @@ class RequestConfig {
        : 'GET'
     }
   }
-  headerParser() {
-    delete this.ctx.request.header.host
-    delete this.ctx.request.header.origin
-    delete this.ctx.request.header.referer
-    this.options = {
-      ...this.options,
-      headers: this.ctx.request.header
-      // headers: {
-      //   'cache-control': 'no-cache',
-      //   'content-type': 'application/x-www-form-urlencoded'
-      // }
-    }
-  
-    return this
-  }
   bodyParser() {
-    const contentType = this.ctx.request.header['Content-Type'] || 'application/x-www-form-urlencoded'
+    const contentType = this.ctx.request.header['content-type'] || 'application/x-www-form-urlencoded'
     switch (contentType) {
       case 'application/json': 
         this.options = {
           ...this.options,
           body: this.ctx.request.body,
-          json: true
+          json: true,
+          headers: {
+            'content-type': contentType
+          }
         }   
         break
       default:
         this.options = {
           ...this.options,
-          form: this.ctx.request.body   
+          form: this.ctx.request.body,
+          headers: {
+            'content-type': contentType
+          }
         }
     }
     return this

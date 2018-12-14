@@ -1,29 +1,38 @@
 var QueryPark = (function() {
   function _QueryPark() {
-    this.userCenter = {}
-    this.init().fetchUserInfo()
-  }
+    this.userCenter = {};
+    this.init().fetchUserInfo();
+  };
 
   _QueryPark.prototype.init = function() {
-    this.usercode = this.getUserCode()
-    this.$infoContainer = $('.info-container')
-    this.$noParkContainer =$('.no-park-container')
-    return this
-  }
+    this.usercode = this.getUserCode();
+    this.$infoContainer = $('.info-container');
+    this.$noParkContainer = $('.no-park-container');
+    return this;
+  };
 
   _QueryPark.prototype.getUserCode = function() {
-    var matchUserCodes = location.href.match('UserId=\\w*', 'gi')
-
-    if (matchUserCodes) {
-      return matchUserCodes[0].split('=')[1]
-    } else {
-      alert('url中缺少UserId')
-      return 
+    var ticket = getQueryString('ticket');
+    ticket = '-3115813412745165671';
+    alert(ticket);
+    if (!ticket) {
+      alert('url中缺少ticket');
+      return;
     }
-  }
+    
+    var timestamp = new Date().getTime() + '';
+    var data = {
+      ticket: ticket,
+      timestamp: timestamp,
+      token: md5(ticket + ';' + 'CY&2v#K!;' + timestamp)
+    };
+
+    console.log(data);
+    
+  };
 
   _QueryPark.prototype.fetchUserInfo = function() {
-    var self = this
+    var self = this;
     var settings = {
       // 'url': 'http://eip.8531.cn/8531ClientService/InfoWebService/EIPWebService.asmx/GetUserInfoByUserID',
       'url': '/8531ClientService/InfoWebService/EIPWebService.asmx/GetUserInfoByUserID',
@@ -38,36 +47,36 @@ var QueryPark = (function() {
         'UserID': this.usercode
       },
       'success': function(data) {
-        var result
+        var result;
         if (typeof data === 'string') {
-          result = JSON.parse(data)
+          result = JSON.parse(data);
         } else {
-          result = JSON.parse(data.children[0].innerHTML)
-        }
+          result = JSON.parse(data.children[0].innerHTML);
+        };
   
-        self.fetchUserID(result)
+        self.fetchUserID(result);
       },
       'error': function() {
-        alert('获取用户信息出错')
+        alert('获取用户信息出错');
       }
-    }
-    $.ajax(settings)
-  }
+    };
+    $.ajax(settings);
+  };
   
   _QueryPark.prototype.requestTime = function(date) {
-    var requestTimeString = ''
-    requestTimeString += date.getFullYear()
-    requestTimeString += date.getMonth() + 1
-    requestTimeString += date.getDate()
-    requestTimeString += date.getHours()
-    requestTimeString += date.getMinutes()
-    requestTimeString += date.getSeconds()
-    return requestTimeString
-  }
+    var requestTimeString = '';
+    requestTimeString += date.getFullYear();
+    requestTimeString += date.getMonth() + 1;
+    requestTimeString += date.getDate();
+    requestTimeString += date.getHours();
+    requestTimeString += date.getMinutes();
+    requestTimeString += date.getSeconds();
+    return requestTimeString;
+  };
 
   _QueryPark.prototype.fetchUserID = function(userInfos) {
-    var self = this
-    var visitTime = new Date().getTime().toString()
+    var self = this;
+    var visitTime = new Date().getTime().toString();
   
     var settings = {
       // http://erp.8531.cn/service/MobilePaylipServlet
@@ -85,54 +94,54 @@ var QueryPark = (function() {
         'key': md5('getClerkCode_' + visitTime + '_^#Erp,.[-]')
       },
       'success': function(res) {
-        var data
+        var data;
         if (typeof res === 'string') {
-          data = JSON.parse(res)
+          data = JSON.parse(res);
         } else {
-          data = res
-        }
+          data = res;
+        };
         if (data.des !== '查询成功！') {
-          alert(查询工号失败)
-          return
-        }
+          alert('查询工号失败');
+          return;
+        };
         
-        var userID = data.clerkCode
+        var userID = data.clerkCode;
         if (userInfos.Rows.length) {
-          var userInfo = userInfos.Rows[0]
-          self.userCenter.username = userInfo.UserName
-          self.userCenter.userID = userID
-          self.userCenter.userLoginName = userInfo.userLoginName
-          self.userCenter.mobile = userInfo.Mobile
+          var userInfo = userInfos.Rows[0];
+          self.userCenter.username = userInfo.UserName;
+          self.userCenter.userID = userID;
+          self.userCenter.userLoginName = userInfo.userLoginName;
+          self.userCenter.mobile = userInfo.Mobile;
         
-          self.checkPark()
+          self.checkPark();
         } else {
-          self.renderNoPark()
-        }
+          self.renderNoPark();
+        };
       },
       'error': function(error) {
-        alert('获取工号出错')
+        alert('获取工号出错');
       }
-    }
+    };
   
-    $.ajax(settings)
-  }
+    $.ajax(settings);
+  };
   
   _QueryPark.prototype.checkPark = function() {
-    var self = this
-    var date = new Date()
-    var transactionID = date.getTime().toString()
+    var self = this;
+    var date = new Date();
+    var transactionID = date.getTime().toString();
     
     var busiInfo = {
       'licensePlate': '',
       'custCode': this.userCenter.userID,
       'custName': this.userCenter.username,
       'phone': this.userCenter.mobile
-    }
+    };
     var busiInfoString = JSON.stringify({
       busiInfo: busiInfo
-    })
-    var md5String = busiInfoString.substring(1, busiInfoString.length - 1)
-    var sign = md5(transactionID + md5String.length + md5String + 'MD5Key')
+    });
+    var md5String = busiInfoString.substring(1, busiInfoString.length - 1);
+    var sign = md5(transactionID + md5String.length + md5String + 'MD5Key');
   
     var params = {
       'busiInfo': busiInfo,
@@ -144,7 +153,7 @@ var QueryPark = (function() {
         'version': '1.0',
         'sign': sign
       }
-    }
+    };
   
     var settings = {
       // 'url': 'http://parking.8531.cn:9092/uip-icop/services/'
@@ -156,55 +165,64 @@ var QueryPark = (function() {
       },
       'data': JSON.stringify(params),
       'success': function(result) {
-        self.render(result)
+        self.render(result);
       },
       'error': function(xhr, type) {
-        alert('请求停车信息出错')
-        console.log('请求停车信息出错')
+        alert('请求停车信息出错');
+        console.log('请求停车信息出错');
       }
-    }
-    $.ajax(settings)
-  }
+    };
+    $.ajax(settings);
+  };
 
   _QueryPark.prototype.render = function(data) {
-    var busiInfo = data.busiInfo
+    var busiInfo = data.busiInfo;
   
     if (busiInfo.customerInfo) {
-      this.renderInfo(busiInfo)
+      this.renderInfo(busiInfo);
     } else {
-      this.renderNoPark()  
-    }
-  }
+      this.renderNoPark();  
+    };
+  };
 
   _QueryPark.prototype.renderInfo = function(busiInfo) {
     this.$infoContainer.css({
       'display': 'block'
-    })
+    });
     this.$noParkContainer.css({
       'display': 'none'
-    })
-    $('.name').text(this.userCenter.username)
-    $('.data.worker-id').text(this.userCenter.userID)
-    $('.data.car-id').text(busiInfo.customerInfo.licensePlate)
-    $('.data.time-left').text(busiInfo.customerInfo.balanceInfos[0].balanceUnit + '小时')
-  }
+    });
+    $('.name').text(this.userCenter.username);
+    $('.data.worker-id').text(this.userCenter.userID);
+    $('.data.car-id').text(busiInfo.customerInfo.licensePlate);
+    $('.data.time-left').text(busiInfo.customerInfo.balanceInfos[0].balanceUnit + '小时');
+  };
 
   _QueryPark.prototype.renderNoPark = function() {
     this.$infoContainer.css({
       'display': 'none'
-    })
+    });
     this.$noParkContainer.css({
       'display': 'block'
-    })
-  }
+    });
+  };
 
   return {
     init: function() {
-      new _QueryPark()
+      new _QueryPark();
     }
-  }
-})()
+  };
+})();
 
 $(document).ready(function() {
-  QueryPark.init()  
+  QueryPark.init(); 
 })
+
+function getQueryString(name) {
+  var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+  var r = window.location.search.substr(1).match(reg);
+  if (r != null) {
+    return unescape(r[2]);
+  }    
+  return null;
+}
