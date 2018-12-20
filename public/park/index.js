@@ -186,6 +186,7 @@ var QueryPark = (function() {
       type: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Requested-With': ''
       },
       data: JSON.stringify(params),
       success: function(res) {
