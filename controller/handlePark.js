@@ -75,7 +75,7 @@ const parkMessage = async(ctx) => {
     body: ctx.request.body,
     json: true
   }
-  
+  console.log(options)
   const result = await new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
