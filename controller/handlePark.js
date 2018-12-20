@@ -1,4 +1,4 @@
-const { RequestConfig, requestPromise, handleError } = require('./utils')
+const { RequestConfig, requestPromise, request, handleError } = require('./utils')
 
 const login = async(ctx) => {
   const url = 'http://10.100.64.31:25000' + ctx.request.url
@@ -45,21 +45,47 @@ const userId = async(ctx) => {
   }
 }
 
+// const parkMessage = async(ctx) => {
+//   const url = 'http://parking.8531.cn:9092' + ctx.request.url
+//   const requestConfig = new RequestConfig(ctx, url).bodyParser()
+//   console.log(requestConfig.options)
+//   try {
+//     const result = await requestPromise(requestConfig.options)
+//     const { response, body } = result
+//     const { statusCode = 404 } = response
+//     ctx.response.statusCode = statusCode
+//     // console.log(result)
+//     ctx.body = body    
+//   } catch(error) {
+//     handleError(error, ctx)
+//   }  
+// }
 const parkMessage = async(ctx) => {
-  const url = 'http://parking.8531.cn:9092' + ctx.request.url
-  const requestConfig = new RequestConfig(ctx, url).bodyParser()
-  // console.log(requestConfig.options)
-  try {
-    const result = await requestPromise(requestConfig.options)
-
-    const { response, body } = result
-    const { statusCode = 404 } = response
-    ctx.response.statusCode = statusCode
-    console.log(result)
-    ctx.body = body    
-  } catch(error) {
-    handleError(error, ctx)
-  }  
+  var options = { 
+    method: 'POST',
+    url: 'http://parking.8531.cn:9092/uip-icop/services/',
+    headers: { 
+      'cache-control': 'no-cache',
+      'Content-Type': 'application/json' 
+    },
+    body: ctx.request.body,
+    json: true
+  }
+  console.log(options)
+  const result = await new Promise((resolve, reject) => {
+    request(options, function (error, response, body) {
+      if (error) {
+        reject(error)
+      }
+      resolve({
+        response,
+        body
+      })
+    })
+  })
+  const { response, body } = result
+  ctx.response.statusCode = response.statusCode
+  ctx.body = body
 }
 
 module.exports = {

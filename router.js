@@ -1,7 +1,7 @@
 const Router = require('koa-router')
 const router = new Router()
 const handlePark = require('./controller/handlePark')
-// const handleSalary = require('./controller/handleSalary')
+const handleSalary = require('./controller/handleSalary')
 
 // park
 router.post('/api/login', handlePark.login)

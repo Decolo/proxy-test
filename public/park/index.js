@@ -5,15 +5,14 @@ var QueryPark = (function() {
   };
 
   _QueryPark.prototype.init = function() {
-    this.getUserCode();
+    this.fetchUserCode();
     this.$infoContainer = $('.info-container');
     this.$noParkContainer = $('.no-park-container');
   };
 
-  _QueryPark.prototype.getUserCode = function() {
-    var _this = this
+  _QueryPark.prototype.fetchUserCode = function() {
+    var self = this
     var ticket = getQueryString('ticket');
-
     if (!ticket) {
       alert('url中缺少ticket');
       return;
@@ -22,16 +21,17 @@ var QueryPark = (function() {
     var timestamp = Date.parse(new Date());
     var uuid = setUUID();
     var signature = sha256('&&' + uuid + '&&' + timestamp + '&&Yc?32!&4<3u');
+    var params = {
+      ticket: ticket,
+      timestamp: timestamp,
+      token: md5(ticket + ';CY&2v#K!;' + timestamp)
+    };
 
     var settings = {
       url: '/api/login',
       type: 'POST',
       dataType: 'json',
-      data: {
-        ticket: ticket,
-        timestamp: timestamp,
-        token: md5(ticket + ';CY&2v#K!;' + timestamp)
-      },
+      data: params,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'X-SESSION-ID': '',
@@ -41,8 +41,9 @@ var QueryPark = (function() {
       },
       success: function(res) {
         if (res.code == 0) {
-          _this.usercode = res.data.session.login_name
-          _this.fetchUserInfo()
+          self.usercode = res.data.session.login_name
+          // self.usercode = 'linsq'
+          self.fetchUserInfo()
         } else {
           alert(res.code);
         };
@@ -70,13 +71,11 @@ var QueryPark = (function() {
       },
       success: function(res) {
         var data;
-        
         if (typeof res === 'string') {
           data = JSON.parse(res);
         } else {
           data = JSON.parse(res.children[0].innerHTML);
         };
-  
         self.fetchUserID(data);
       },
       error: function() {
@@ -99,7 +98,7 @@ var QueryPark = (function() {
 
   _QueryPark.prototype.fetchUserID = function(userInfos) {
     var self = this;
-    var visitTime = new Date().getTime().toString();
+    var visitTime = Date.parse(new Date());
   
     var settings = {
       // http://erp.8531.cn/service/MobilePaylipServlet
@@ -122,6 +121,7 @@ var QueryPark = (function() {
         } else {
           data = res;
         };
+        // alert(JSON.stringify(res))
 
         if (data.des !== '查询成功！') {
           alert('查询工号失败');
@@ -136,12 +136,12 @@ var QueryPark = (function() {
           self.userCenter.userLoginName = userInfo.userLoginName;
           self.userCenter.mobile = userInfo.Mobile;
           // alert(JSON.stringify(self.userCenter))
-          self.checkPark();
+          self.fetchParkInfo();
         } else {
           self.renderNoPark();
         };
       },
-      'error': function(error) {
+      'error': function() {
         alert('获取工号出错');
       }
     };
@@ -149,7 +149,7 @@ var QueryPark = (function() {
     $.ajax(settings);
   };
   
-  _QueryPark.prototype.checkPark = function() {
+  _QueryPark.prototype.fetchParkInfo = function() {
     var self = this;
     var date = new Date();
     var transactionID = Date.parse(date).toString();
@@ -251,7 +251,7 @@ function getQueryString(name) {
   return null;
 }
 
- function setUUID() {
+function setUUID() {
   var s = [];
   var hexDigits = '0123456789abcdef';
   for (var i = 0; i < 36; i++) {

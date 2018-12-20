@@ -36,7 +36,7 @@ class RequestConfig {
           body: this.ctx.request.body,
           json: true,
         }   
-        break
+        break;
       default:
         this.options = {
           ...this.options,
