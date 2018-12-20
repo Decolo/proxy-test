@@ -10,7 +10,7 @@ var QuerySalary = (function() {
   };
 
   _QuerySalary.prototype.init = function() {
-    this.usercode = this.getUserCode();
+    // this.usercode = this.getUserCode();
     this.$login = $('.login');
     this.$submitBtn = $('.submit');
     this.$salaryInfo = $('.salary-info');
@@ -31,10 +31,11 @@ var QuerySalary = (function() {
     this.$submitBtn.on('click', function() {
       var inputVal = self.$inputPwd.val().trim();
       if (!inputVal) {
+        alert('密码不为空');
         return;
       };
       self.password = inputVal;
-      self.fetchSalaryInfo();
+      self.getUserCode();
     });
 
     return this;
@@ -73,43 +74,49 @@ var QuerySalary = (function() {
     });
   }
   
-  _QuerySalary.prototype.getUserCode = function() {
+  _QueryPark.prototype.getUserCode = function() {
+    var self = this
     var ticket = getQueryString('ticket');
-    ticket = '-3115813412745165671';
-    alert(ticket);
+
     if (!ticket) {
       alert('url中缺少ticket');
       return;
     }
-    
-    var timestamp = new Date().getTime() + '';
-    var data = {
-      ticket: ticket,
-      timestamp: timestamp,
-      token: md5(ticket + ';' + 'CY&2v#K!;' + timestamp)
+    // alert(ticket)
+    var timestamp = Date.parse(new Date());
+    var uuid = setUUID();
+    var signature = sha256('&&' + uuid + '&&' + timestamp + '&&Yc?32!&4<3u');
+
+    var settings = {
+      url: '/api/login',
+      type: 'POST',
+      dataType: 'json',
+      data: {
+        ticket: ticket,
+        timestamp: timestamp,
+        token: md5(ticket + ';CY&2v#K!;' + timestamp)
+      },
+      headers: {
+        'X-SESSION-ID': '',
+        'X-REQUEST-ID': uuid,
+        'X-TIMESTAMP': timestamp,
+        'X-SIGNATURE': signature
+      },
+      success: function(res) {
+        if (res.code == 0) {
+          console.log(res.code);
+          self.usercode = res.data.code
+          self.fetchSalaryInfo()
+        } else {
+          alert(res.code);
+        };
+      },
+      error: function(error){
+        alert(error, 'error');
+      }
     };
-
-    console.log(data);
-    // var settings = {
-    //   'url': '/api/login',
-    //   'type': 'POST',
-    //   'headers': {
-    //     'content-type': 'application/x-www-form-urlencoded',
-    //     'cache-control': 'no-cache',
-    //   },
-    //   'data': data,
-    //   'dataType': 'json',
-    //   'success': function(res) {
-    //     console.log(res)
-    //   },
-    //   'error': function() {
-    //     alert('获取用户信息出错')
-    //     console.log('获取用户信息出错')
-    //   }
-    // }
-
-    // $.ajax(settings)
-  }
+    $.ajax(settings);
+  };
 
   _QuerySalary.prototype.fetchSalaryInfo = function(dates) {
     var self = this;

@@ -8,7 +8,6 @@
   <script>
     (function (doc, win){
       var docEle = doc.documentElement
-      var isIOS = navigator.userAgent.match(/iphone|ipod|ipad/gi)
       var dpr = Math.min(win.devicePixelRatio, 3)
       var scale = 1 / dpr
       var resizeEvent = 'orientationchange' in window ? 'orientationchange' : 'resize'
@@ -79,9 +78,9 @@
       <div class="no-park-info">您还未办理停车卡</div>
     </div>
   </div>
-  
-  <script src="lib/md5.min.js"></script>
-  <script src="lib/zepto.min.js"></script>
-  <script src="index.js"></script>
+  <script type="text/javascript" src="lib/sha256.min.js"></script>
+  <script type="text/javascript" src="lib/md5.min.js"></script>
+  <script type="text/javascript" src="lib/zepto.min.js"></script>
+  <script type="text/javascript" src="index.js"></script>
 </body>
 </html>

@@ -1,62 +1,85 @@
 var QueryPark = (function() {
   function _QueryPark() {
     this.userCenter = {};
-    this.init().fetchUserInfo();
+    this.init()
   };
 
   _QueryPark.prototype.init = function() {
-    this.usercode = this.getUserCode();
+    this.getUserCode();
     this.$infoContainer = $('.info-container');
     this.$noParkContainer = $('.no-park-container');
-    return this;
   };
 
   _QueryPark.prototype.getUserCode = function() {
+    var _this = this
     var ticket = getQueryString('ticket');
-    ticket = '-3115813412745165671';
-    alert(ticket);
+
     if (!ticket) {
       alert('url中缺少ticket');
       return;
     }
-    
-    var timestamp = new Date().getTime() + '';
-    var data = {
-      ticket: ticket,
-      timestamp: timestamp,
-      token: md5(ticket + ';' + 'CY&2v#K!;' + timestamp)
-    };
 
-    console.log(data);
-    
+    var timestamp = Date.parse(new Date());
+    var uuid = setUUID();
+    var signature = sha256('&&' + uuid + '&&' + timestamp + '&&Yc?32!&4<3u');
+
+    var settings = {
+      url: '/api/login',
+      type: 'POST',
+      dataType: 'json',
+      data: {
+        ticket: ticket,
+        timestamp: timestamp,
+        token: md5(ticket + ';CY&2v#K!;' + timestamp)
+      },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-SESSION-ID': '',
+        'X-REQUEST-ID': uuid,
+        'X-TIMESTAMP': timestamp,
+        'X-SIGNATURE': signature
+      },
+      success: function(res) {
+        if (res.code == 0) {
+          _this.usercode = res.data.session.login_name
+          _this.fetchUserInfo()
+        } else {
+          alert(res.code);
+        };
+      },
+      error: function(error){
+        alert(error, 'error');
+      }
+    };
+    $.ajax(settings);
   };
 
   _QueryPark.prototype.fetchUserInfo = function() {
     var self = this;
     var settings = {
       // 'url': 'http://eip.8531.cn/8531ClientService/InfoWebService/EIPWebService.asmx/GetUserInfoByUserID',
-      'url': '/8531ClientService/InfoWebService/EIPWebService.asmx/GetUserInfoByUserID',
-      'type': 'POST',
-      'headers': {
+      url: '/8531ClientService/InfoWebService/EIPWebService.asmx/GetUserInfoByUserID',
+      type: 'POST',
+      headers: {
         // default: application/x-www-form-urlencoded
         'Content-Type': 'application/x-www-form-urlencoded',
-        'cache-control': 'no-cache',
       },
-      'dataType': 'xml',
-      'data': {
+      dataType: 'xml',
+      data: {
         'UserID': this.usercode
       },
-      'success': function(data) {
-        var result;
-        if (typeof data === 'string') {
-          result = JSON.parse(data);
+      success: function(res) {
+        var data;
+        
+        if (typeof res === 'string') {
+          data = JSON.parse(res);
         } else {
-          result = JSON.parse(data.children[0].innerHTML);
+          data = JSON.parse(res.children[0].innerHTML);
         };
   
-        self.fetchUserID(result);
+        self.fetchUserID(data);
       },
-      'error': function() {
+      error: function() {
         alert('获取用户信息出错');
       }
     };
@@ -80,26 +103,26 @@ var QueryPark = (function() {
   
     var settings = {
       // http://erp.8531.cn/service/MobilePaylipServlet
-      'url': '/service/MobilePaylipServlet',
-      'type': 'POST',
-      'headers': {
+      url: '/service/MobilePaylipServlet',
+      type: 'POST',
+      headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'cache-control': 'no-cache',
       },
-      'dataType': 'json',
-      'data': {
-        'method': 'getClerkCode',
-        'usercode': this.usercode,
-        'visitTime': visitTime,
-        'key': md5('getClerkCode_' + visitTime + '_^#Erp,.[-]')
+      dataType: 'json',
+      data: {
+        method: 'getClerkCode',
+        usercode: this.usercode,
+        visitTime: visitTime,
+        key: md5('getClerkCode_' + visitTime + '_^#Erp,.[-]')
       },
-      'success': function(res) {
+      success: function(res) {
         var data;
         if (typeof res === 'string') {
           data = JSON.parse(res);
         } else {
           data = res;
         };
+
         if (data.des !== '查询成功！') {
           alert('查询工号失败');
           return;
@@ -112,7 +135,7 @@ var QueryPark = (function() {
           self.userCenter.userID = userID;
           self.userCenter.userLoginName = userInfo.userLoginName;
           self.userCenter.mobile = userInfo.Mobile;
-        
+          // alert(JSON.stringify(self.userCenter))
           self.checkPark();
         } else {
           self.renderNoPark();
@@ -129,45 +152,46 @@ var QueryPark = (function() {
   _QueryPark.prototype.checkPark = function() {
     var self = this;
     var date = new Date();
-    var transactionID = date.getTime().toString();
+    var transactionID = Date.parse(date).toString();
     
     var busiInfo = {
-      'licensePlate': '',
-      'custCode': this.userCenter.userID,
-      'custName': this.userCenter.username,
-      'phone': this.userCenter.mobile
+      licensePlate: '',
+      custCode: this.userCenter.userID,
+      custName: this.userCenter.username,
+      phone: this.userCenter.mobile
     };
+
     var busiInfoString = JSON.stringify({
       busiInfo: busiInfo
     });
+
     var md5String = busiInfoString.substring(1, busiInfoString.length - 1);
     var sign = md5(transactionID + md5String.length + md5String + 'MD5Key');
   
     var params = {
-      'busiInfo': busiInfo,
-      'reqPubInfo': {
-        'systemNo': '01',
-        'method': 'queryCustomerBalance',
-        'transactionID': transactionID.toString(),
-        'requestTime': this.requestTime(date),
-        'version': '1.0',
-        'sign': sign
+      busiInfo: busiInfo,
+      reqPubInfo: {
+        systemNo: '01',
+        method: 'queryCustomerBalance',
+        transactionID: transactionID.toString(),
+        requestTime: this.requestTime(date),
+        version: '1.0',
+        sign: sign
       }
     };
-  
+    
     var settings = {
       // 'url': 'http://parking.8531.cn:9092/uip-icop/services/'
-      'url': '/uip-icop/services',
-      'type': 'POST',
-      'headers': {
+      url: '/uip-icop/services',
+      type: 'POST',
+      headers: {
         'Content-Type': 'application/json',
-        'cache-control': 'no-cache',
       },
-      'data': JSON.stringify(params),
-      'success': function(result) {
-        self.render(result);
+      data: JSON.stringify(params),
+      success: function(res) {
+        self.render(res);
       },
-      'error': function(xhr, type) {
+      error: function() {
         alert('请求停车信息出错');
         console.log('请求停车信息出错');
       }
@@ -216,7 +240,7 @@ var QueryPark = (function() {
 
 $(document).ready(function() {
   QueryPark.init(); 
-})
+});
 
 function getQueryString(name) {
   var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
@@ -225,4 +249,17 @@ function getQueryString(name) {
     return unescape(r[2]);
   }    
   return null;
+}
+
+ function setUUID() {
+  var s = [];
+  var hexDigits = '0123456789abcdef';
+  for (var i = 0; i < 36; i++) {
+    s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+  }
+  s[14] = '4';
+  s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
+  s[8] = s[13] = s[18] = s[23] = '-';
+  var uuid = s.join("");
+  return uuid;
 }

@@ -18,11 +18,13 @@ const requestPromise = options => {
 class RequestConfig {
   constructor(ctx, url) {
     this.ctx = ctx
+    const { host, origin, referer, ...headers } = ctx.request.headers
     this.options = {
       url,
       method: typeof ctx.request.method === 'string' ?
        ctx.request.method.toUpperCase()
-       : 'GET'
+       : 'GET',
+      headers,
     }
   }
   bodyParser() {
@@ -33,25 +35,19 @@ class RequestConfig {
           ...this.options,
           body: this.ctx.request.body,
           json: true,
-          headers: {
-            'content-type': contentType
-          }
         }   
         break
       default:
         this.options = {
           ...this.options,
           form: this.ctx.request.body,
-          headers: {
-            'content-type': contentType
-          }
         }
     }
     return this
   }
 }
 
-const handleError = error => {
+const handleError = (error, ctx) => {
   console.log('error:' + String(error))
   ctx.response.status = 500
   ctx.response.body = 'Server Error'
