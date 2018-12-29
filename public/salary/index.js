@@ -92,6 +92,7 @@ var QuerySalary = (function() {
     };
 
     var settings = {
+      //'http://10.100.64.31:25000/api/login'
       url: '/api/login',
       type: 'POST',
       dataType: 'json',
@@ -105,8 +106,8 @@ var QuerySalary = (function() {
       },
       success: function(res) {
         if (res.code == 0) {
-          // self.usercode = res.data.session.login_name
-          self.usercode = 'wangrh'
+          self.usercode = res.data.session.login_name
+          // self.usercode = 'wangrh'
           self.fetchSalaryInfo()
         } else {
           alert(res.code);
@@ -137,8 +138,7 @@ var QuerySalary = (function() {
       data.period = dates[1]
     };
     var settings = {
-      // http://10.100.60.70:87/uapws/service/IMobilePaylipService?wsdl
-      // http://61.164.45.179:1099/service/IMobilePaylipService?wsdl
+      //'http://10.100.68.97/service/MobilePaylipServlet'
       'url': '/service/MobilePaylipServlet',
       'type': 'POST',
       'headers': {
@@ -208,7 +208,7 @@ function getQueryString(name) {
     return unescape(r[2]);
   }    
   return null;
-}
+};
 
 function setUUID() {
   var s = [];
@@ -221,5 +221,5 @@ function setUUID() {
   s[8] = s[13] = s[18] = s[23] = '-';
   var uuid = s.join("");
   return uuid;
-}
+};
 

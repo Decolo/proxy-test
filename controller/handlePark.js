@@ -52,7 +52,7 @@ const parkMessage = async(ctx) => {
     method: 'POST',
     url: 'http://parking.8531.cn:9092' + ctx.request.url,
     headers: { 
-      'Content-Type': 'application/json' 
+      'Content-Type': 'application/json'
     },
     body: ctx.request.body,
     json: true
@@ -70,34 +70,6 @@ const parkMessage = async(ctx) => {
     handleError(error, ctx)
   }  
 }
-
-// const parkMessage = async(ctx) => {
-//   var options = { 
-//     method: 'POST',
-//     url: 'http://parking.8531.cn:9092' + ctx.request.url,
-//     headers: { 
-//       'Content-Type': 'application/json' 
-//     },
-//     body: ctx.request.body,
-//     json: true
-//   }
-  
-//   const result = await new Promise((resolve, reject) => {
-//     request(options, function (error, response, body) {
-//       if (error) {
-//         reject(error)
-//       }
-//       resolve({
-//         response,
-//         body
-//       })
-//     })
-//   })
-//   const { response, body } = result
-//   ctx.response.statusCode = response.statusCode
-//   ctx.body = body
-//   console.log(body)
-// }
 
 module.exports = {
   userId,

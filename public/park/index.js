@@ -41,9 +41,9 @@ var QueryPark = (function() {
       },
       success: function(res) {
         if (res.code == 0) {
-          self.usercode = res.data.session.login_name
+          self.usercode = res.data.session.login_name;
           // self.usercode = 'linsq'
-          self.fetchUserInfo()
+          self.fetchUserInfo();
         } else {
           alert(res.code);
         };
@@ -250,7 +250,7 @@ function getQueryString(name) {
     return unescape(r[2]);
   }    
   return null;
-}
+};
 
 function setUUID() {
   var s = [];
@@ -263,4 +263,4 @@ function setUUID() {
   s[8] = s[13] = s[18] = s[23] = '-';
   var uuid = s.join("");
   return uuid;
-}
+};
