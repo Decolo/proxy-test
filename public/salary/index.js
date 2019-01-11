@@ -1,9 +1,3 @@
-if ('addEventListener' in document) {
-	document.addEventListener('DOMContentLoaded', function() {
-		FastClick.attach(document.body);
-	}, false);
-};
-
 var QuerySalary = (function() {
   function _QuerySalary() {
     this.init().bindEvent().initMobileSelect();
@@ -15,13 +9,9 @@ var QuerySalary = (function() {
     this.$salaryInfo = $('.salary-info');
     this.$inputPwd = $('.input-pwd');
     this.$salaryList = $('.salary-list');
-    this.$login.css({
-      display: 'block'
-    });
-    
-    this.$salaryInfo.css({
-      display: 'none'
-    });
+    this.$login.show();
+    this.$salaryInfo.hide();
+
     return this;
   }
 
@@ -30,6 +20,7 @@ var QuerySalary = (function() {
     
     this.$submitBtn.on('click', function() {
       var inputVal = self.$inputPwd.val().trim();
+
       if (!inputVal) {
         alert('密码不为空');
         return;
@@ -53,7 +44,7 @@ var QuerySalary = (function() {
         monthNowIndex = i - 1;
       }
       monthes.push(i);
-    }
+    };
     for (var j = 1987; j <= yearNow; j++) {
       years.push(j);
     };
@@ -105,15 +96,16 @@ var QuerySalary = (function() {
         'X-SIGNATURE': signature
       },
       success: function(res) {
+        console.log(res);
         if (res.code == 0) {
-          self.usercode = res.data.session.login_name
+          self.usercode = res.data.session.login_name;
           // self.usercode = 'wangrh'
-          self.fetchSalaryInfo()
+          self.fetchSalaryInfo();
         } else {
           alert(res.code);
         };
       },
-      error: function(error){
+      error: function(error) {
         alert(error, 'error');
       }
     };
@@ -125,7 +117,7 @@ var QuerySalary = (function() {
     var visitTime = Date.parse(new Date());
     var key = md5('getSalary_' + visitTime + '_^#Erp,.[-]');
     var salarypswd = md5(this.password + '_^#Erp,.[-]').toUpperCase();
-
+    console.log(this.usercode);
     var data = {
       'method': 'getSalary',
       'usercode': this.usercode,
@@ -198,6 +190,7 @@ var QuerySalary = (function() {
 })();
 
 $(document).ready(function() {
+  FastClick.attach(document.body);
   QuerySalary.init();
 });
 
