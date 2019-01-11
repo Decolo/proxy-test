@@ -16,11 +16,11 @@ ul, li {
   width: 100%;
   height: 100%;
   background-color: #f2f2f2;
-  /* display: none; */
-}
-.info-container {
   display: none;
 }
+/* .info-container {
+  display: none;
+} */
 .no-park-logo {
   width: 33.3rem; 
   height: 33.3rem;
