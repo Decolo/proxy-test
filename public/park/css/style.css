@@ -9,15 +9,16 @@ html, body {
   margin: 0;
   box-sizing: border-box;
 }
-
 ul, li {
   list-style: none;
 }
-
-.no-park-container {
+.info-container, .no-park-container {
   width: 100%;
   height: 100%;
   background-color: #f2f2f2;
+  /* display: none; */
+}
+.info-container {
   display: none;
 }
 .no-park-logo {
