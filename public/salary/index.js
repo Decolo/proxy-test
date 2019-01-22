@@ -1,6 +1,6 @@
 var QuerySalary = (function() {
   function _QuerySalary() {
-    this.init().fetchUserCode().bindEvent().initMobileSelect();
+    this.init().fetchUserCode().initMobileSelect().bindEvent();
   };
 
   _QuerySalary.prototype.init = function() {
@@ -14,40 +14,38 @@ var QuerySalary = (function() {
     this.$salaryInfo.hide();
 
     return this;
-  }
+  };
 
   _QuerySalary.prototype.bindEvent = function() {
     var self = this;
     
     this.$submitBtn.on('click', function() {
       var inputVal = self.$inputPwd.val().trim();
-
       if (!inputVal) {
         alert('密码不为空');
         return;
       };
       self.password = inputVal;
-      
       self.fetchSalaryInfo();
     });
 
     return this;
-  }
+  };
 
   _QuerySalary.prototype.initMobileSelect = function() {
     var self = this;
     var monthes = [], years = [];
     var dateNow = new Date();
-    var yearNow = dateNow.getFullYear();
-    var monthNow = dateNow.getMonth() + 1;
+    this.yearNow = dateNow.getFullYear();
+    this.monthNow = dateNow.getMonth() + 1;
     var monthNowIndex;
     for (var i = 1; i <= 12; i++) {
-      if (monthNow === i) {
+      if (this.monthNow === i) {
         monthNowIndex = i - 1;
       }
       monthes.push(i);
     };
-    for (var j = 1987; j <= yearNow; j++) {
+    for (var j = 1987; j <= this.yearNow; j++) {
       years.push(j);
     };
   
@@ -65,6 +63,8 @@ var QuerySalary = (function() {
       },
       ensureBtnColor: '#b83e3d',
     });
+
+    return this;
   }
   
   _QuerySalary.prototype.fetchUserCode = function() {
@@ -99,9 +99,9 @@ var QuerySalary = (function() {
       },
       success: function(res) {
         if (res.code == 0) {
-          // self.usercode = res.data.session.login_name;
+          self.usercode = res.data.session.login_name;
           // self.usercode = 'wangrh';
-          self.usercode = 'caichen';
+          // self.usercode = 'caichen';
         } else {
           alert(res.code);
         };
@@ -154,7 +154,7 @@ var QuerySalary = (function() {
           self.$salaryInfo.css({
             display: 'block'
           })
-          self.render(data.year, data.period, res)
+          self.render(res)
         }
       },
       'error': function() {
@@ -165,10 +165,7 @@ var QuerySalary = (function() {
     $.ajax(settings);
   }
 
-  _QuerySalary.prototype.render = function(year, month, data) {
-    var dateNow = new Date();
-    year = year || dateNow.getFullYear();
-    month = month || dateNow.getMonth() + 1;    
+  _QuerySalary.prototype.render = function(data) {
     var salarystructlist = data.salarystructlist;
     var salarydetaillist, clerkInfo;
     var listTemplate = '';
@@ -187,7 +184,7 @@ var QuerySalary = (function() {
           item.showcontent + '</div></li>';
       });
       this.$salaryList.html(listTemplate);
-      this.$dateBox.html(year + '-' + month);
+      this.$dateBox.html(this.yearNow + '-' + this.monthNow);
     } 
   }
 

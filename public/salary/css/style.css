@@ -68,7 +68,7 @@ ul, li {
 }
 
 .salary-info {
-  /* display: none; */
+  display: none;
   margin-top: 5.8rem;
   box-sizing: content-box;
   border: 1px solid #c0c0c0;
