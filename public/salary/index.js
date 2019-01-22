@@ -154,7 +154,7 @@ var QuerySalary = (function() {
           self.$salaryInfo.css({
             display: 'block'
           })
-          self.render(res)
+          self.render(data.year, data.period, res)
         }
       },
       'error': function() {
@@ -165,7 +165,9 @@ var QuerySalary = (function() {
     $.ajax(settings);
   }
 
-  _QuerySalary.prototype.render = function(data) {
+  _QuerySalary.prototype.render = function(year, month, data) {
+    var year = year || this.yearNow;
+    var month = month || this.monthNow;
     var salarystructlist = data.salarystructlist;
     var salarydetaillist, clerkInfo;
     var listTemplate = '';
@@ -184,7 +186,7 @@ var QuerySalary = (function() {
           item.showcontent + '</div></li>';
       });
       this.$salaryList.html(listTemplate);
-      this.$dateBox.html(this.yearNow + '-' + this.monthNow);
+      this.$dateBox.html(year + '-' + month);
     } 
   }
 
