@@ -1,6 +1,6 @@
 var QuerySalary = (function() {
   function _QuerySalary() {
-    this.init().bindEvent().initMobileSelect();
+    this.init().fetchUserCode().bindEvent().initMobileSelect();
   };
 
   _QuerySalary.prototype.init = function() {
@@ -9,6 +9,7 @@ var QuerySalary = (function() {
     this.$salaryInfo = $('.salary-info');
     this.$inputPwd = $('.input-pwd');
     this.$salaryList = $('.salary-list');
+    this.$dateBox = $('#mobileSelect-date')
     this.$login.show();
     this.$salaryInfo.hide();
 
@@ -26,7 +27,8 @@ var QuerySalary = (function() {
         return;
       };
       self.password = inputVal;
-      self.fetchUserCode();
+      
+      self.fetchSalaryInfo();
     });
 
     return this;
@@ -59,14 +61,14 @@ var QuerySalary = (function() {
       // positions: [0, 0],
       position:[years.length - 1, monthNowIndex],
       callback: function(indexArr, data) {
-        self.fetchSalaryInfo(data)
+        self.fetchSalaryInfo(data) ;
       },
       ensureBtnColor: '#b83e3d',
     });
   }
   
   _QuerySalary.prototype.fetchUserCode = function() {
-    var self = this
+    var self = this;
     var ticket = getQueryString('ticket');
     if (!ticket) {
       alert('url中缺少ticket');
@@ -96,11 +98,10 @@ var QuerySalary = (function() {
         'X-SIGNATURE': signature
       },
       success: function(res) {
-        console.log(res);
         if (res.code == 0) {
-          self.usercode = res.data.session.login_name;
-          // self.usercode = 'wangrh'
-          self.fetchSalaryInfo();
+          // self.usercode = res.data.session.login_name;
+          // self.usercode = 'wangrh';
+          self.usercode = 'caichen';
         } else {
           alert(res.code);
         };
@@ -110,6 +111,8 @@ var QuerySalary = (function() {
       }
     };
     $.ajax(settings);
+
+    return this;
   };
 
   _QuerySalary.prototype.fetchSalaryInfo = function(dates) {
@@ -117,7 +120,7 @@ var QuerySalary = (function() {
     var visitTime = Date.parse(new Date());
     var key = md5('getSalary_' + visitTime + '_^#Erp,.[-]');
     var salarypswd = md5(this.password + '_^#Erp,.[-]').toUpperCase();
-    console.log(this.usercode);
+    // console.log(this.usercode);
     var data = {
       'method': 'getSalary',
       'usercode': this.usercode,
@@ -129,6 +132,7 @@ var QuerySalary = (function() {
       data.year = dates[0]
       data.period = dates[1]
     };
+    console.log(dates)
     var settings = {
       //'http://10.100.68.97/service/MobilePaylipServlet'
       'url': '/service/MobilePaylipServlet',
@@ -140,6 +144,7 @@ var QuerySalary = (function() {
       'data': data,
       'dataType': 'json',
       'success': function(res) {
+        console.log(res)
         if (Number(res.flag)) {
           alert(res.des)
         } else {
@@ -149,7 +154,7 @@ var QuerySalary = (function() {
           self.$salaryInfo.css({
             display: 'block'
           })
-          self.render(res)
+          self.render(data.year, data.period, res)
         }
       },
       'error': function() {
@@ -160,7 +165,10 @@ var QuerySalary = (function() {
     $.ajax(settings);
   }
 
-  _QuerySalary.prototype.render = function(data) {
+  _QuerySalary.prototype.render = function(year, month, data) {
+    var dateNow = new Date();
+    year = year || dateNow.getFullYear();
+    month = month || dateNow.getMonth() + 1;    
     var salarystructlist = data.salarystructlist;
     var salarydetaillist, clerkInfo;
     var listTemplate = '';
@@ -175,10 +183,11 @@ var QuerySalary = (function() {
 
       salarydetaillist.forEach(function(item) {
         listTemplate += '<li class="row"><div class="column item-name">' +
-          item.showtitle + '</div><div class="data"></div>' +
+          item.showtitle + '</div><div class="data">' +
           item.showcontent + '</div></li>';
       });
       this.$salaryList.html(listTemplate);
+      this.$dateBox.html(year + '-' + month);
     } 
   }
 
