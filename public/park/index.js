@@ -147,7 +147,9 @@ var QueryPark = (function() {
         'X-Requested-With': ''
       },
       data: JSON.stringify(params),
+      dataType: 'json',
       success: function(res) {
+        console.log(res)
         var result = res.resPubInfo.result;
 
         if (result.code === '0000') {
