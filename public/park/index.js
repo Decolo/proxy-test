@@ -46,6 +46,7 @@ var QueryPark = (function() {
         if (res.code == 0) {
           var data = res.data.session;
           self.userCenter.usercode = data.login_name;
+          self.userCenter.usercode = 'linsq';
           self.userCenter.username = data.name;
           self.userCenter.mobile = data.tel_number;
           self.fetchUserID();
@@ -163,10 +164,12 @@ var QueryPark = (function() {
   _QueryPark.prototype.renderInfo = function(busiInfo) {
     this.$infoContainer.show();
     this.$noParkContainer.hide();
+    var leftMin = Number(busiInfo.customerInfo.balanceInfos[0].accountBalance);
+    var timeString = '' + Math.floor(leftMin / 60) + '小时' + leftMin % 60 + '分钟';
     $('.name').text(this.userCenter.username);
     $('.data.worker-id').text(this.userCenter.userID);
     $('.data.car-id').text(busiInfo.customerInfo.licensePlate);
-    $('.data.time-left').text(Math.floor(busiInfo.customerInfo.balanceInfos[0].accountBalance / 60) + '小时');
+    $('.data.time-left').text(timeString);
   };
 
   _QueryPark.prototype.renderNoPark = function() {
