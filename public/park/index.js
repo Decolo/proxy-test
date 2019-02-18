@@ -46,7 +46,7 @@ var QueryPark = (function() {
         if (res.code == 0) {
           var data = res.data.session;
           self.userCenter.usercode = data.login_name;
-          self.userCenter.usercode = 'linsq';
+          // self.userCenter.usercode = 'linsq';
           self.userCenter.username = data.name;
           self.userCenter.mobile = data.tel_number;
           self.fetchUserID();
@@ -112,7 +112,7 @@ var QueryPark = (function() {
     });
     var md5String = busiInfoString.substring(1, busiInfoString.length - 1);
     var sign = md5(transactionID + md5String.length + md5String + 'MD5Key');
-  
+    
     var data = {
       busiInfo: busiInfo,
       reqPubInfo: {
@@ -213,7 +213,8 @@ function setUUID() {
 function requestTime(date) {
   var requestTimeString = '';
   requestTimeString += date.getFullYear();
-  requestTimeString += date.getMonth() + 1;
+  var month = date.getMonth() + 1;
+  requestTimeString += month < 10 ? '0' + month : month;
   requestTimeString += date.getDate();
   requestTimeString += date.getHours();
   requestTimeString += date.getMinutes();

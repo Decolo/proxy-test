@@ -70,7 +70,7 @@ ul, li {
 .row:first-of-type {
   height: 23rem;
   line-height: 23rem;
-  justify-content: left;
+  justify-content: flex-start;
 }
 .row:last-of-type {
   border: none;
