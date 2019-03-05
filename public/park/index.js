@@ -46,7 +46,6 @@ var QueryPark = (function() {
         if (res.code == 0) {
           var data = res.data.session;
           self.userCenter.usercode = data.login_name;
-          // self.userCenter.usercode = 'linsq';
           self.userCenter.username = data.name;
           self.userCenter.mobile = data.tel_number;
           self.fetchUserID();
@@ -92,13 +91,11 @@ var QueryPark = (function() {
         alert('获取工号出错');
       }
     };
-  
     $.ajax(settings);
   };
   
   _QueryPark.prototype.fetchParkInfo = function() {
     var self = this;
-
     var date = new Date();
     var transactionID = Date.parse(date).toString();
     var busiInfo = {
@@ -206,7 +203,7 @@ function setUUID() {
   s[14] = '4';
   s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
   s[8] = s[13] = s[18] = s[23] = '-';
-  var uuid = s.join("");
+  var uuid = s.join('');
   return uuid;
 };
 
@@ -214,8 +211,9 @@ function requestTime(date) {
   var requestTimeString = '';
   requestTimeString += date.getFullYear();
   var month = date.getMonth() + 1;
+  var day = date.getDate();
   requestTimeString += month < 10 ? '0' + month : month;
-  requestTimeString += date.getDate();
+  requestTimeString += day < 10 ? '0' + day : day;
   requestTimeString += date.getHours();
   requestTimeString += date.getMinutes();
   requestTimeString += date.getSeconds();
