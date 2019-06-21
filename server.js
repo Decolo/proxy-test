@@ -10,4 +10,4 @@ app.use(bodyParser())
 app.use(staticParser(path.resolve(__dirname, './public')))
 app.use(router.routes())
 
-app.listen(3000, console.log('Listenning on port 3000'))
+app.listen(3001, console.log('Listenning on port 3001'))

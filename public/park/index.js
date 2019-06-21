@@ -45,7 +45,12 @@ var QueryPark = (function() {
       success: function(res) {
         if (res.code == 0) {
           var data = res.data.session;
-          self.userCenter.usercode = data.login_name;
+          var usercode = data.login_name
+          if (!usercode) {
+            alert('缺少usercode');
+            return;
+          }
+          self.userCenter.usercode = usercode;
           self.userCenter.username = data.name;
           self.userCenter.mobile = data.tel_number;
           self.fetchUserID();

@@ -78,7 +78,7 @@ var QuerySalary = (function() {
     var timestamp = Date.parse(new Date());
     var uuid = setUUID();
     var signature = sha256('&&' + uuid + '&&' + timestamp + '&&Yc?32!&4<3u');
-    var params = {
+    var data = {
       ticket: ticket,
       timestamp: timestamp,
       token: md5(ticket + ';CY&2v#K!;' + timestamp)
@@ -89,7 +89,7 @@ var QuerySalary = (function() {
       url: '/api/login',
       type: 'POST',
       dataType: 'json',
-      data: params,
+      data: data,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'X-SESSION-ID': '',
@@ -99,7 +99,7 @@ var QuerySalary = (function() {
       },
       success: function(res) {
         if (res.code == 0) {
-          self.usercode = res.data.session.login_name;
+          self.usercode = res.data.session.login_name || '';
           // self.usercode = 'wangrh';
           // self.usercode = 'caichen';
         } else {
@@ -120,6 +120,10 @@ var QuerySalary = (function() {
     var visitTime = Date.parse(new Date());
     var key = md5('getSalary_' + visitTime + '_^#Erp,.[-]');
     var salarypswd = md5(this.password + '_^#Erp,.[-]').toUpperCase();
+    if (!this.usercode) {
+      alert('缺少usercode')
+      return
+    }
     // console.log(this.usercode);
     var data = {
       'method': 'getSalary',
