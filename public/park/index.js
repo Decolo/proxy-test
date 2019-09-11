@@ -14,7 +14,7 @@ var QueryPark = (function() {
   };
 
   _QueryPark.prototype.fetchUserInfo = function() {
-    var self = this
+    var self = this;
     var ticket = getQueryString('ticket');
     if (!ticket) {
       alert('url中缺少ticket');

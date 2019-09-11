@@ -100,6 +100,7 @@ var QuerySalary = (function() {
       success: function(res) {
         if (res.code == 0) {
           self.usercode = res.data.session.login_name || '';
+          self.session_id = res.data.session.id || '';
           // self.usercode = 'wangrh';
           // self.usercode = 'caichen';
         } else {
@@ -126,24 +127,34 @@ var QuerySalary = (function() {
     }
     // console.log(this.usercode);
     var data = {
-      'method': 'getSalary',
-      'usercode': this.usercode,
+      // 'method': 'getSalary',
+      // 'usercode': this.usercode,
       'salarypswd': salarypswd,
       'visitTime': visitTime,
       'key': key
     };
     if (dates && dates.length) {
-      data.year = dates[0]
-      data.period = dates[1]
+      data.year = dates[0];
+      data.period = dates[1];
     };
-    console.log(dates)
+
+    var session_id = this.session_id || '';
+    var request_id = setUUID();
+    var timestamp = Date.parse(new Date());
+    var signature = sha256(request_id + '&&' + timestamp + '&&' + 'Yc?32!&4<3u');
+
     var settings = {
       //'http://10.100.68.97/service/MobilePaylipServlet'
-      'url': '/service/MobilePaylipServlet',
+      // 'url': '/service/MobilePaylipServlet',
+      'url': '/api/erp/salary',
       'type': 'POST',
       'headers': {
         'content-type': 'application/x-www-form-urlencoded',
         'cache-control': 'no-cache',
+        'X-SESSION-ID': session_id,
+        'X-REQUEST-ID': request_id,
+        'X-TIMESTAMP': timestamp,
+        'X-SIGNATURE': signature
       },
       'data': data,
       'dataType': 'json',
