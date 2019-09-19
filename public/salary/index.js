@@ -1,6 +1,7 @@
 var QuerySalary = (function() {
   function _QuerySalary() {
     this.init().fetchUserCode().initMobileSelect().bindEvent();
+    // this.fetchSalaryInfo();
   };
 
   _QuerySalary.prototype.init = function() {
@@ -104,11 +105,11 @@ var QuerySalary = (function() {
           // self.usercode = 'wangrh';
           // self.usercode = 'caichen';
         } else {
-          alert(res.code);
+          alert(res.message);
         };
       },
       error: function(error) {
-        alert(error, 'error');
+        alert(error.toString());
       }
     };
     $.ajax(settings);
@@ -118,14 +119,13 @@ var QuerySalary = (function() {
 
   _QuerySalary.prototype.fetchSalaryInfo = function(dates) {
     var self = this;
-    var visitTime = Date.parse(new Date());
-    var key = md5('getSalary_' + visitTime + '_^#Erp,.[-]');
-    var salarypswd = md5(this.password + '_^#Erp,.[-]').toUpperCase();
     if (!this.usercode) {
       alert('缺少usercode')
       return
     }
-    // console.log(this.usercode);
+    var salarypswd = md5(this.password + '_^#Erp,.[-]').toUpperCase();
+    var visitTime = Date.parse(new Date());
+    var key = md5('getSalary_' + visitTime + '_^#Erp,.[-]');
     var data = {
       // 'method': 'getSalary',
       // 'usercode': this.usercode,
@@ -141,25 +141,26 @@ var QuerySalary = (function() {
     var session_id = this.session_id || '';
     var request_id = setUUID();
     var timestamp = Date.parse(new Date());
-    var signature = sha256(request_id + '&&' + timestamp + '&&' + 'Yc?32!&4<3u');
+    var signature = sha256(session_id + '&&' + request_id + '&&' + timestamp + '&&' + 'Yc?32!&4<3u');
+
+    var headers = {
+      'content-type': 'application/x-www-form-urlencoded',
+      'cache-control': 'no-cache',
+      'X-SESSION-ID': session_id,
+      'X-REQUEST-ID': request_id,
+      'X-TIMESTAMP': timestamp,
+      'X-SIGNATURE': signature
+    }
 
     var settings = {
       //'http://10.100.68.97/service/MobilePaylipServlet'
       // 'url': '/service/MobilePaylipServlet',
       'url': '/api/erp/salary',
       'type': 'POST',
-      'headers': {
-        'content-type': 'application/x-www-form-urlencoded',
-        'cache-control': 'no-cache',
-        'X-SESSION-ID': session_id,
-        'X-REQUEST-ID': request_id,
-        'X-TIMESTAMP': timestamp,
-        'X-SIGNATURE': signature
-      },
+      'headers': headers,
       'data': data,
       'dataType': 'json',
       'success': function(res) {
-        console.log(res)
         if (Number(res.flag)) {
           alert(res.des)
         } else {
