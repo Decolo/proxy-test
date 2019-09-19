@@ -1,7 +1,8 @@
 const { RequestConfig, requestPromise, request, handleError } = require('./utils')
 
 const login = async(ctx) => {
-  const url = 'http://10.100.64.31:25000' + ctx.request.url
+  // const url = 'http://10.100.64.31:25000' + ctx.request.url
+  const url = 'https://oayd.8531.cn' + ctx.request.url
   const requestConfig = new RequestConfig(ctx, url).bodyParser()
   // console.log(requestConfig.options)
   try {

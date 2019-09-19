@@ -27,7 +27,7 @@ var QuerySalary = (function() {
         return;
       };
       self.password = inputVal;
-      self.fetchSalaryInfo();
+      self.fetchSalaryInfo([self.yearNow, self.monthNow]);
     });
 
     return this;
@@ -59,8 +59,8 @@ var QuerySalary = (function() {
       ],
       // positions: [0, 0],
       position:[years.length - 1, monthNowIndex],
-      callback: function(indexArr, data) {
-        self.fetchSalaryInfo(data) ;
+      callback: function(indexArr, dates) {
+        self.fetchSalaryInfo(dates) ;
       },
       ensureBtnColor: '#b83e3d',
     });
