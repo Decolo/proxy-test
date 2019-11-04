@@ -38,12 +38,13 @@ var QuerySalary = (function() {
     var monthes = [], years = [];
     var dateNow = new Date();
     this.yearNow = dateNow.getFullYear();
-    this.monthNow = dateNow.getMonth() + 1;
+    this.monthNow = dateNow.getMonth();
     var monthNowIndex;
     for (var i = 1; i <= 12; i++) {
       if (this.monthNow === i) {
         monthNowIndex = i - 1;
       }
+
       monthes.push(i);
     };
     for (var j = 1987; j <= this.yearNow; j++) {
